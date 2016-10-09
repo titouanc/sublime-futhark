@@ -5,13 +5,14 @@ file_extensions: [fut]
 scope: source.futhark
 
 variables:
-  identifier: '[A-Za-z_][A-Za-z_0-9]*'
+  name: '[A-Za-z_][A-Za-z_0-9]*'
+  identifier: '(?:{{name}}\.)?{{name}}'
   numeric: '[0-9]+'
   decimal: '{{numeric}}\.{{numeric}}'
   scientific: '({{decimal}}|{{numeric}})e-?{{numeric}}'
   nat_type: '\*?(?:\[\w*\])*{{identifier}}'
   tuple: '\({{nat_type}}(?:,\s*{{nat_type}})+\)'
-  type: '{{tuple}}|(?:{{identifier}}\.)?{{nat_type}}'
+  type: '{{tuple}}|{{nat_type}}'
   typed_arg: '({{identifier}})\s*:\s*({{type}})'
 
 contexts:
