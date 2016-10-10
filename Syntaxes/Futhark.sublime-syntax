@@ -10,7 +10,9 @@ variables:
   numeric: '[0-9]+'
   decimal: '{{numeric}}\.{{numeric}}'
   scientific: '({{decimal}}|{{numeric}})e-?{{numeric}}'
-  nat_type: '\*?(?:\[\w*\])*{{identifier}}'
+  builtin_types: 'bool|f32|f64|i16|i32|i64|i8|int|real|u16|u32|u64|u8'
+  array_type: '\*?(?:\[\w*\])*'
+  nat_type: '{{array_type}}(?:{{builtin_types}}|{{identifier}})'
   tuple: '\({{nat_type}}(?:,\s*{{nat_type}})+\)'
   type: '{{tuple}}|{{nat_type}}'
   typed_arg: '({{identifier}})\s*:\s*({{type}})'
@@ -25,11 +27,11 @@ contexts:
     - match: 'True|False'
       scope: constant.language.futhark
 
-    - match: '\b-?{{scientific}}|{{decimal}}|{{numeric}}\b'
+    - match: '\b-?{{scientific}}|{{decimal}}|{{numeric}}(?:{{builtin_types}})\b'
       scope: constant.numeric
     
     # Types
-    - match: '(array_type)*(bool|f32|f64|i16|i32|i64|i8|int|real|u16|u32|u64|u8)'
+    - match: '{{array_type}}{{builtin_types}}'
       scope: storage.type.futhark
     
     # Keywords and operators
