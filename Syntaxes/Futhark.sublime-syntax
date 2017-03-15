@@ -38,7 +38,7 @@ contexts:
     - match: '\b(default|do|else|empty|for|if|in|include|let|loop|not|op|struct|then|unsafe|while|with)\b'
       scope: keyword.futhark
 
-    - match: '\+|-|\*|/|//|%|%%|==|\!=|<|<=|\*\*|\^|&|\||>>|<<|>>>'
+    - match: '\+|-|\*|/|//|%|%%|==|\!=|<|<=|\*\*|\^|&|\||>>|<<|>>>|->'
       scope: keyword.operator.arithmetic.futhark
 
     - match: '='
@@ -76,6 +76,12 @@ contexts:
         2: variable.parameter.futhark
         3: keyword.operator.assignment.futhark
       push: lambdaargs
+
+    - match: '(\\)(\w+)\s*(->)\(?'
+      captures:
+        1: keyword.operator.assignment.futhark
+        2: variable.parameter.futhark
+        3: keyword.operator.assignment.futhark
     
     # Everything else is considered as a variable
     - match: '\b{{identifier}}\b'
@@ -115,7 +121,7 @@ contexts:
     - include: args
 
     # Return type and function body
-    - match: '\)\s*:\s*({{type}})\s*(=)'
+    - match: '\)[\s\n]*:[\s\n]*({{type}})[\s\n]*(=)'
       captures:
           1: storage.type.futhark
           2: keyword.operator.assignment.futhark
