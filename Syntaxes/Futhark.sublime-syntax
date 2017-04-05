@@ -15,7 +15,8 @@ variables:
   nat_type: '{{array_type}}(?:{{builtin_types}}|{{identifier}})'
   tuple: '\({{nat_type}}(?:,\s*{{nat_type}})+\)'
   type: '{{tuple}}|{{nat_type}}'
-  typed_arg: '({{identifier}})\s*:\s*({{type}})'
+  type_annotation: '\s*:\s*({{type}})'
+  typed_arg: '({{identifier}}){{type_annotation}}'
 
 contexts:
   main:
@@ -23,10 +24,11 @@ contexts:
     - match: '--.*'
       scope: comment.line.futhark
     
-    # Litteral constants
+    # Literal constants
     - match: 'True|False'
       scope: constant.language.futhark
-
+    
+    # Literal numbers
     - match: '\b-?{{scientific}}|{{decimal}}|{{numeric}}(?:{{builtin_types}})\b'
       scope: constant.numeric
     
@@ -35,12 +37,14 @@ contexts:
       scope: storage.type.futhark
     
     # Keywords and operators
-    - match: '\b(default|do|else|empty|for|if|in|include|let|loop|not|op|struct|then|unsafe|while|with)\b'
+    - match: '\b(default|do|else|empty|for|if|in|import|include|let|loop|module|not|op|struct|then|unsafe|val|while|with)\b'
       scope: keyword.futhark
 
+    # Operators
     - match: '\+|-|\*|/|//|%|%%|==|\!=|<|<=|\*\*|\^|&|\||>>|<<|>>>|->'
       scope: keyword.operator.arithmetic.futhark
 
+    # Binding
     - match: '='
       scope: keyword.operator.assignment.futhark
 
@@ -69,7 +73,7 @@ contexts:
         2: entity.name.function.futhark
       push: funcargs
 
-    # Anonymous function declaration
+    # Anonymous function declaration (old syntax)
     - match: '(fn)\s*\(?'
       captures:
         1: keyword.futhark
@@ -77,6 +81,7 @@ contexts:
         3: keyword.operator.assignment.futhark
       push: lambdaargs
 
+    # Lambda ala Haskell (\x -> expr)
     - match: '(\\)(\w+)\s*(->)\(?'
       captures:
         1: keyword.operator.assignment.futhark
@@ -121,7 +126,7 @@ contexts:
     - include: args
 
     # Return type and function body
-    - match: '\)[\s\n]*:[\s\n]*({{type}})[\s\n]*(=)'
+    - match: '\)(?:{{type_annotation}})?\s*(=)'
       captures:
           1: storage.type.futhark
           2: keyword.operator.assignment.futhark
