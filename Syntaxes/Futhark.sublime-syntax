@@ -35,7 +35,7 @@ contexts:
       scope: storage.type.futhark
     
     # Keywords and operators
-    - match: '\b(default|do|else|empty|for|if|in|include|let|loop|not|op|struct|then|unsafe|while|with)\b'
+    - match: '\b(default|do|else|empty|for|if|import|in|include|let|loop|not|op|struct|then|unsafe|while|with)\b'
       scope: keyword.futhark
 
     - match: '\+|-|\*|/|//|%|%%|==|\!=|<|<=|\*\*|\^|&|\||>>|<<|>>>|->'
