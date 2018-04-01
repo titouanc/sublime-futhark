@@ -11,7 +11,7 @@ variables:
   decimal: '{{numeric}}\.{{numeric}}'
   scientific: '({{decimal}}|{{numeric}})e-?{{numeric}}'
   builtin_types: 'bool|f32|f64|i16|i32|i64|i8|int|real|u16|u32|u64|u8'
-  array_type: '\*?(?:\[\w*\])*'
+  array_type: '\*?(?:\[[\w#]*\])*'
   nat_type: '{{array_type}}(?:{{builtin_types}}|{{identifier}})'
   tuple: '\({{nat_type}}(?:,\s*{{nat_type}})+\)'
   type: '{{tuple}}|{{nat_type}}'
@@ -37,7 +37,7 @@ contexts:
       scope: storage.type.futhark
     
     # Keywords and operators
-    - match: '\b(default|do|else|empty|for|if|in|import|include|let|loop|module|not|op|struct|then|unsafe|val|while|with)\b'
+    - match: '\b(default|do|else|empty|for|if|in|import|include|loop|module|not|op|struct|then|unsafe|val|while|with)\b'
       scope: keyword.futhark
 
     # Operators
@@ -66,8 +66,15 @@ contexts:
         2: storage.type.futhark
         3: storage.type.futhark
 
+    # Let bindings
+    - match: '(let)\s+({{identifier}})\s*(=)\s*'
+      captures:
+        1: keyword.futhark
+        2: variable.futhark
+        3: keyword.operator.assignment.futhark
+
     # Function declaration start (both regular and entry points)
-    - match: '(fun|entry)\s+({{identifier}})\s*\('
+    - match: '(let|entry)\s+({{identifier}})\s*\('
       captures:
         1: keyword.futhark
         2: entity.name.function.futhark
@@ -82,11 +89,10 @@ contexts:
       push: lambdaargs
 
     # Lambda ala Haskell (\x -> expr)
-    - match: '(\\)(\w+)\s*(->)\(?'
+    - match: '(\\)\s*'
       captures:
         1: keyword.operator.assignment.futhark
-        2: variable.parameter.futhark
-        3: keyword.operator.assignment.futhark
+      push: lambdaargs
     
     # Everything else is considered as a variable
     - match: '\b{{identifier}}\b'
@@ -116,7 +122,7 @@ contexts:
       scope: variable.parameter.futhark
 
     # Exit to lambda body
-    - match: '\)?\s*(=>)'
+    - match: '\s*(->)'
       captures:
         1: keyword.operator.assignment.futhark
       pop: true
