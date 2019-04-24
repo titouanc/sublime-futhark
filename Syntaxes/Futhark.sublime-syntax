@@ -11,12 +11,13 @@ variables:
   decimal: '{{numeric}}\.{{numeric}}'
   scientific: '({{decimal}}|{{numeric}})e-?{{numeric}}'
   builtin_types: 'bool|f32|f64|i16|i32|i64|i8|int|real|u16|u32|u64|u8'
-  array_type: '\*?(?:\[[\w#]*\])*'
+  array_type: '\*?(?:\[[\w\d]*\])*'
   nat_type: '{{array_type}}(?:{{builtin_types}}|{{identifier}})'
   tuple: '\({{nat_type}}(?:,\s*{{nat_type}})+\)'
   type: '{{tuple}}|{{nat_type}}'
   type_annotation: '\s*:\s*({{type}})'
   typed_arg: '({{identifier}}){{type_annotation}}'
+  shape_args: ((\[[\w]+\])*)
 
 contexts:
   main:
@@ -37,7 +38,7 @@ contexts:
       scope: storage.type.futhark
     
     # Keywords and operators
-    - match: '\b(default|do|else|empty|for|if|in|import|include|loop|module|not|op|struct|then|unsafe|val|while|with)\b'
+    - match: '\b(default|do|else|empty|for|if|in|import|include|loop|module|not|op|struct|then|unsafe|while|with)\b'
       scope: keyword.futhark
 
     # Operators
@@ -49,15 +50,8 @@ contexts:
       scope: keyword.operator.assignment.futhark
 
     # known builtin functions
-    - match: '\b(concat|copy|empty|filter|iota|map|partition|pow|redomap|reduce|reduceComm|replicate|reshape|rotate|scan|shape|size|split|transpose|unzip|write|zip|zipWith)\b'
+    - match: '\b(concat|copy|empty|filter|iota|map|map2|map3|partition|pow|redomap|reduce|reduceComm|replicate|reshape|rotate|scan|shape|size|split|transpose|unzip|write|zip|zipWith)\b'
       scope: support.function.builtin.futhark
-
-    # Constant declaration
-    - match: '(val)\s*{{typed_arg}}'
-      captures:
-        1: keyword.futhark
-        2: variable
-        3: storage.type.futhark
 
     # Type declaration
     - match: '(type)\s*({{identifier}}) = ({{type}})'
@@ -74,19 +68,12 @@ contexts:
         3: keyword.operator.assignment.futhark
 
     # Function declaration start (both regular and entry points)
-    - match: '(let|entry)\s+({{identifier}})\s*\('
+    - match: '(let|entry)\s+({{identifier}})\s*({{shape_args}})\s*\('
       captures:
         1: keyword.futhark
         2: entity.name.function.futhark
+        3: storage.type.template
       push: funcargs
-
-    # Anonymous function declaration (old syntax)
-    - match: '(fn)\s*\(?'
-      captures:
-        1: keyword.futhark
-        2: variable.parameter.futhark
-        3: keyword.operator.assignment.futhark
-      push: lambdaargs
 
     # Lambda ala Haskell (\x -> expr)
     - match: '(\\)\s*'
